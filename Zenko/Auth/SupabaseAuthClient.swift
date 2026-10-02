@@ -24,6 +24,8 @@ enum ErroAuth: LocalizedError, Equatable {
     case senhaFraca
     case emailInvalido
     case muitasTentativas
+    case limiteDeEmails
+    case emailNaoAutorizado
     case semConexao
     case appleIndisponivel
     case desconhecido(String)
@@ -37,6 +39,8 @@ enum ErroAuth: LocalizedError, Equatable {
         case .senhaFraca: "Senha fraca. Use pelo menos 6 caracteres."
         case .emailInvalido: "Esse e-mail não parece válido."
         case .muitasTentativas: "Muitas tentativas seguidas. Espere alguns minutos e tente de novo."
+        case .limiteDeEmails: "O Zenko atingiu o limite de e-mails enviados por hora. Se você já criou a conta, procure o e-mail de confirmação; senão, tente de novo daqui a uma hora."
+        case .emailNaoAutorizado: "Esse e-mail ainda não pode receber mensagens do Zenko. O servidor de e-mails do app está em configuração."
         case .semConexao: "Sem conexão com a internet."
         case .appleIndisponivel: "Entrar com Apple ainda não está ativado neste app. Use e-mail e senha."
         case .desconhecido(let mensagem): "Não foi possível concluir: \(mensagem)"
@@ -56,7 +60,9 @@ enum ErroAuth: LocalizedError, Equatable {
         case "user_already_exists", "email_exists": return .emailJaCadastrado
         case "weak_password": return .senhaFraca
         case "email_address_invalid": return .emailInvalido
-        case "over_request_rate_limit", "over_email_send_rate_limit": return .muitasTentativas
+        case "over_request_rate_limit": return .muitasTentativas
+        case "over_email_send_rate_limit": return .limiteDeEmails
+        case "email_address_not_authorized": return .emailNaoAutorizado
         default: break
         }
 
@@ -65,6 +71,7 @@ enum ErroAuth: LocalizedError, Equatable {
         if minusculas.contains("email not confirmed") { return .emailNaoConfirmado }
         if minusculas.contains("already registered") { return .emailJaCadastrado }
         if minusculas.contains("password should be") { return .senhaFraca }
+        if minusculas.contains("email rate limit") { return .limiteDeEmails }
         if status == 429 { return .muitasTentativas }
         return .desconhecido(mensagem.isEmpty ? "erro \(status)" : mensagem)
     }

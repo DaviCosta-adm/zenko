@@ -10,7 +10,10 @@ final class AuthTests: XCTestCase {
         XCTAssertEqual(ErroAuth.deResposta(status: 400, corpo: corpo(#"{"error_code":"email_not_confirmed","msg":"Email not confirmed"}"#)), .emailNaoConfirmado)
         XCTAssertEqual(ErroAuth.deResposta(status: 422, corpo: corpo(#"{"error_code":"user_already_exists","msg":"User already registered"}"#)), .emailJaCadastrado)
         XCTAssertEqual(ErroAuth.deResposta(status: 422, corpo: corpo(#"{"error_code":"weak_password","msg":"Password should be at least 6 characters."}"#)), .senhaFraca)
-        XCTAssertEqual(ErroAuth.deResposta(status: 429, corpo: corpo(#"{"error_code":"over_email_send_rate_limit","msg":"..."}"#)), .muitasTentativas)
+        XCTAssertEqual(ErroAuth.deResposta(status: 429, corpo: corpo(#"{"error_code":"over_request_rate_limit","msg":"..."}"#)), .muitasTentativas)
+        XCTAssertEqual(ErroAuth.deResposta(status: 429, corpo: corpo(#"{"error_code":"over_email_send_rate_limit","msg":"email rate limit exceeded"}"#)), .limiteDeEmails)
+        XCTAssertEqual(ErroAuth.deResposta(status: 429, corpo: corpo(#"{"msg":"email rate limit exceeded"}"#)), .limiteDeEmails)
+        XCTAssertEqual(ErroAuth.deResposta(status: 400, corpo: corpo(#"{"error_code":"email_address_not_authorized","msg":"..."}"#)), .emailNaoAutorizado)
     }
 
     func testErrosNoFormatoAntigoEDesconhecidos() {
