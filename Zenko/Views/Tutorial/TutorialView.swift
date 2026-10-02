@@ -63,12 +63,21 @@ private struct PaginaTutorialView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                Image(systemName: pagina.icone)
-                    .font(.system(size: 52, weight: .medium))
-                    .foregroundStyle(pagina.cor)
-                    .frame(width: 110, height: 110)
-                    .background(pagina.cor.opacity(0.12), in: Circle())
-                    .padding(.top, 24)
+                Group {
+                    if let imagem = pagina.imagem {
+                        Image(imagem)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 140, height: 140)
+                    } else {
+                        Image(systemName: pagina.icone)
+                            .font(.system(size: 52, weight: .medium))
+                            .foregroundStyle(pagina.cor)
+                            .frame(width: 110, height: 110)
+                            .background(pagina.cor.opacity(0.12), in: Circle())
+                    }
+                }
+                .padding(.top, 24)
 
                 Text(pagina.titulo)
                     .font(.title2.bold())
@@ -113,6 +122,7 @@ struct PaginaTutorial: Identifiable {
     }
 
     let id: Int
+    var imagem: String? = nil
     let icone: String
     let cor: Color
     let titulo: String
@@ -122,6 +132,7 @@ struct PaginaTutorial: Identifiable {
     static let todas: [PaginaTutorial] = [
         PaginaTutorial(
             id: 0,
+            imagem: "LogoZenko",
             icone: "sparkles",
             cor: .accentColor,
             titulo: "Bem-vindo ao Zenko",
