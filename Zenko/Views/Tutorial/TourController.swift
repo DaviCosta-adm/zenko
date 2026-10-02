@@ -15,16 +15,20 @@ enum AlvoTour: Hashable {
     case abaPainel, novoItem, exemploItem, importarCalendario, novoLembrete, aparencia, verTutorial
 
     /// Abas e botões de toolbar viram controles nativos do UIKit e descartam qualquer
-    /// `.background`; eles são localizados pelo rótulo de acessibilidade (o texto do `Label`).
-    var rotuloNativo: String? {
+    /// `.background`, então são localizados pela posição dentro da barra nativa.
+    /// (O rótulo de acessibilidade não serve: fora do VoiceOver/XCUITest ele costuma vir vazio.)
+    var posicaoNativa: PosicaoNativa? {
         switch self {
-        case .abaPainel: "Painel"
-        case .novoItem: "Novo item"
-        case .importarCalendario: "Importar Calendário"
-        case .novoLembrete: "Novo lembrete"
+        case .abaPainel: .primeiraAba
+        case .importarCalendario: .barraSuperiorEsquerda
+        case .novoItem, .novoLembrete: .barraSuperiorDireita
         case .exemploItem, .aparencia, .verTutorial: nil
         }
     }
+}
+
+enum PosicaoNativa {
+    case barraSuperiorEsquerda, barraSuperiorDireita, primeiraAba
 }
 
 struct PassoTour {
@@ -112,36 +116,54 @@ final class TourController {
     /// Posição do alvo em coordenadas da janela, ou nil se ele não estiver na tela agora
     /// (ex: está numa aba que não é a selecionada).
     func frame(de alvo: AlvoTour) -> CGRect? {
-        if let rotulo = alvo.rotuloNativo {
-            return frameNaJanela(comRotulo: rotulo)
+        if let posicao = alvo.posicaoNativa {
+            return frameNativo(posicao)
         }
         guard let view = fontes[alvo]?.view, let janela = view.window, !view.isHidden else { return nil }
         return view.convert(view.bounds, to: janela)
     }
 
-    private func frameNaJanela(comRotulo rotulo: String) -> CGRect? {
+    private func frameNativo(_ posicao: PosicaoNativa) -> CGRect? {
         let janela = UIApplication.shared.connectedScenes
             .compactMap { ($0 as? UIWindowScene)?.keyWindow }
             .first
         guard let janela else { return nil }
 
-        func buscar(_ view: UIView) -> UIView? {
-            if view.isHidden || view.alpha < 0.01 { return nil }
-            if view.accessibilityLabel == rotulo, view.bounds.width > 1 { return view }
-            for filha in view.subviews {
-                if let achada = buscar(filha) { return achada }
-            }
-            return nil
+        let barra: UIView? = switch posicao {
+        case .barraSuperiorEsquerda, .barraSuperiorDireita: primeiraVisivel(UINavigationBar.self, em: janela)
+        case .primeiraAba: primeiraVisivel(UITabBar.self, em: janela)
         }
-        return buscar(janela).map { $0.convert($0.bounds, to: janela) }
+        guard let barra else { return nil }
+
+        let botoes = controlesVisiveis(em: barra).map { $0.convert($0.bounds, to: janela) }
+        return switch posicao {
+        case .barraSuperiorEsquerda, .primeiraAba: botoes.min { $0.minX < $1.minX }
+        case .barraSuperiorDireita: botoes.max { $0.maxX < $1.maxX }
+        }
+    }
+
+    /// Só a barra da aba selecionada está na janela e visível.
+    private func primeiraVisivel<T: UIView>(_ tipo: T.Type, em view: UIView) -> T? {
+        if view.isHidden || view.alpha < 0.01 { return nil }
+        if let achada = view as? T, achada.bounds.width > 0 { return achada }
+        for filha in view.subviews {
+            if let achada = primeiraVisivel(tipo, em: filha) { return achada }
+        }
+        return nil
+    }
+
+    private func controlesVisiveis(em view: UIView) -> [UIView] {
+        if view.isHidden || view.alpha < 0.01 { return [] }
+        let proprio: [UIView] = (view is UIControl && view.bounds.width >= 20 && view.bounds.height >= 20) ? [view] : []
+        return proprio + view.subviews.flatMap { controlesVisiveis(em: $0) }
     }
 
     fileprivate func registrar(_ view: UIView, como alvo: AlvoTour) {
         fontes[alvo] = ReferenciaFraca(view: view)
     }
 
-    func iniciar() {
-        irPara(0)
+    func iniciar(noPasso indice: Int = 0) {
+        irPara(min(max(indice, 0), passos.count - 1))
     }
 
     func avancar() {

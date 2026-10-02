@@ -47,6 +47,16 @@ private struct RaizView: View {
         .environment(tour)
         .task {
             PreferenciaRepository(context: context).carregarOuCriar()
+            #if DEBUG
+            // Abre o tour direto num passo, sem XCUITest (que liga a acessibilidade e mascara bugs).
+            let argumentos = ProcessInfo.processInfo.arguments
+            if let posicao = argumentos.firstIndex(of: "-tour-passo"), posicao + 1 < argumentos.count,
+               let passo = Int(argumentos[posicao + 1]) {
+                try? await Task.sleep(for: .milliseconds(400))
+                tour.iniciar(noPasso: passo)
+                return
+            }
+            #endif
             if !tutorialConcluido {
                 try? await Task.sleep(for: .milliseconds(400))
                 withAnimation { tour.iniciar() }
