@@ -73,15 +73,30 @@ final class ZenkoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["A senha precisa ter pelo menos 6 caracteres."].waitForExistence(timeout: 2))
     }
 
+    /// Usa o servidor real: precisa de internet.
+    @MainActor
+    func testSenhaErradaMostraMensagemDoServidor() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitesting-deslogar"]
+        app.launch()
+
+        let email = app.textFields["campoEmail"]
+        XCTAssertTrue(email.waitForExistence(timeout: 5))
+        email.tap()
+        email.typeText("naoexiste@zenko.app")
+        app.secureTextFields["campoSenha"].tap()
+        app.secureTextFields["campoSenha"].typeText("senhaerrada123")
+        app.buttons["botaoEnviar"].tap()
+
+        XCTAssertTrue(app.staticTexts["E-mail ou senha incorretos."].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.tabBars.buttons["Painel"].exists)
+    }
+
     @MainActor
     func testSairDaContaVoltaParaOLogin() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitesting-deslogar", "-uitesting-pular-tutorial"]
+        app.launchArguments = ["-uitesting-sem-login", "-uitesting-pular-tutorial"]
         app.launch()
-
-        let entrarDev = app.buttons["Entrar sem servidor (só em desenvolvimento)"]
-        XCTAssertTrue(entrarDev.waitForExistence(timeout: 5))
-        entrarDev.tap()
 
         let abaConfiguracoes = app.tabBars.buttons["Configurações"].firstMatch
         XCTAssertTrue(abaConfiguracoes.waitForExistence(timeout: 5))

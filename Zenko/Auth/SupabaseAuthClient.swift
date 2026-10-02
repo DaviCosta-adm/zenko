@@ -129,7 +129,10 @@ final class SupabaseAuthClient {
         request.timeoutInterval = 20
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(chave, forHTTPHeaderField: "apikey")
-        request.setValue("Bearer \(token ?? chave)", forHTTPHeaderField: "Authorization")
+        // Chaves `sb_publishable_` não são JWT: o gateway recusa se forem enviadas como Bearer.
+        if let token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
         request.httpBody = try JSONEncoder().encode(corpo)
 
         let dados: Data
