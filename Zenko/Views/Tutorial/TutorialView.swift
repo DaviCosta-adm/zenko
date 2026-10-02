@@ -195,6 +195,7 @@ struct PaginaTutorial: Identifiable {
             dicas: [
                 .init(icone: "arrow.up.circle.fill", cor: .red, texto: "Nota positiva sobe a importância. Ex: o nome do seu maior cliente com +30."),
                 .init(icone: "arrow.down.circle.fill", cor: .gray, texto: "Nota negativa baixa a importância. Ex: \"newsletter\" com -30."),
+                .init(icone: "paintpalette.fill", cor: .green, texto: "Em Configurações > Aparência, escolha tema claro, escuro ou automático pelo horário, e a cor do app."),
                 .init(icone: "questionmark.circle.fill", cor: .green, texto: "Pode rever este tutorial quando quiser em Configurações."),
             ]
         ),

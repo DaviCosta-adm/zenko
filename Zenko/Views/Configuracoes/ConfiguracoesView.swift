@@ -14,6 +14,11 @@ struct ConfiguracoesView: View {
         NavigationStack {
             Form {
                 Section {
+                    NavigationLink {
+                        AparenciaView()
+                    } label: {
+                        Label("Aparência", systemImage: "paintpalette")
+                    }
                     Button {
                         mostrandoTutorial = true
                     } label: {
@@ -28,6 +33,7 @@ struct ConfiguracoesView: View {
             .navigationTitle("Configurações")
             .sheet(isPresented: $mostrandoTutorial) {
                 TutorialView()
+                    .temaZenko()
             }
             .task { viewModel.garantirPreferencias(context: context) }
         }

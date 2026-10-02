@@ -15,6 +15,7 @@ struct ZenkoApp: App {
     var body: some Scene {
         WindowGroup {
             RaizView()
+                .temaZenko()
         }
         .modelContainer(for: [
             ItemRegistrado.self,
@@ -44,6 +45,7 @@ private struct RaizView: View {
             set: { tutorialConcluido = !$0 }
         )) {
             TutorialView()
+                .temaZenko()
         }
     }
 }
