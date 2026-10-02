@@ -8,16 +8,27 @@ struct ConfiguracoesView: View {
     @State private var viewModel = ConfiguracoesViewModel()
     @State private var novaPalavra = ""
     @State private var novoPeso = 20
+    @State private var mostrandoTutorial = false
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    Button {
+                        mostrandoTutorial = true
+                    } label: {
+                        Label("Ver tutorial", systemImage: "questionmark.circle")
+                    }
+                }
                 if let preferencia = preferencias.first {
                     secaoPreferencias(preferencia)
                 }
                 secaoRegras
             }
             .navigationTitle("Configurações")
+            .sheet(isPresented: $mostrandoTutorial) {
+                TutorialView()
+            }
             .task { viewModel.garantirPreferencias(context: context) }
         }
     }

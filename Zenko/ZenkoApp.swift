@@ -3,6 +3,15 @@ import SwiftData
 
 @main
 struct ZenkoApp: App {
+    init() {
+        let argumentos = ProcessInfo.processInfo.arguments
+        if argumentos.contains("-uitesting-pular-tutorial") {
+            UserDefaults.standard.set(true, forKey: TutorialStorage.concluido)
+        } else if argumentos.contains("-uitesting-mostrar-tutorial") {
+            UserDefaults.standard.set(false, forKey: TutorialStorage.concluido)
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             RaizView()
@@ -18,6 +27,7 @@ struct ZenkoApp: App {
 
 private struct RaizView: View {
     @Environment(\.modelContext) private var context
+    @AppStorage(TutorialStorage.concluido) private var tutorialConcluido = false
 
     var body: some View {
         TabView {
@@ -29,5 +39,11 @@ private struct RaizView: View {
                 .tabItem { Label("Configurações", systemImage: "gearshape") }
         }
         .task { PreferenciaRepository(context: context).carregarOuCriar() }
+        .fullScreenCover(isPresented: Binding(
+            get: { !tutorialConcluido },
+            set: { tutorialConcluido = !$0 }
+        )) {
+            TutorialView()
+        }
     }
 }
