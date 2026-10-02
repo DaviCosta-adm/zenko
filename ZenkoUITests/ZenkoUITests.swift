@@ -23,8 +23,15 @@ final class ZenkoUITests: XCTestCase {
         XCTAssertTrue(proximo.waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Bem-vindo ao Zenko"].exists)
 
-        while proximo.exists { proximo.tap() }
+        let seta = app.images["setaDoTour"]
+        for passo in 1...6 {
+            XCTAssertTrue(proximo.waitForExistence(timeout: 3))
+            XCTAssertTrue(seta.waitForExistence(timeout: 3), "Passo \(passo) sem seta apontando para um elemento")
+            proximo.tap()
+        }
 
+        XCTAssertTrue(app.buttons["Concluir"].waitForExistence(timeout: 3))
+        XCTAssertTrue(seta.waitForExistence(timeout: 3), "Passo 7 sem seta apontando para um elemento")
         XCTAssertTrue(app.staticTexts["Pronto!"].exists)
         app.buttons["Concluir"].tap()
 

@@ -6,10 +6,28 @@ struct PainelView: View {
     @Query(sort: \ItemRegistrado.timestamp, order: .reverse) var itens: [ItemRegistrado]
     @State private var viewModel = PainelViewModel()
     @State private var mostrandoNovoItem = false
+    @Environment(TourController.self) private var tour: TourController?
+
+    /// Item fictício (não salvo) mostrado só durante o passo do tour que explica as cores.
+    private static let itemExemplo = ItemRegistrado(
+        titulo: "Boleto da luz (exemplo)",
+        conteudo: "Vence amanhã",
+        origem: "manual",
+        pontuacaoImportancia: 85,
+        categoria: "financeiro"
+    )
+
+    private var mostrandoExemplo: Bool {
+        tour?.passo?.alvo == .exemploItem
+    }
 
     var body: some View {
         NavigationStack {
             List {
+                if mostrandoExemplo {
+                    linha(Self.itemExemplo)
+                        .alvoDoTour(.exemploItem)
+                }
                 ForEach(itens) { item in
                     linha(item)
                         .contentShape(Rectangle())
@@ -20,7 +38,7 @@ struct PainelView: View {
                 }
             }
             .overlay {
-                if itens.isEmpty {
+                if itens.isEmpty && !mostrandoExemplo {
                     ContentUnavailableView(
                         "Nada por aqui",
                         systemImage: "tray",

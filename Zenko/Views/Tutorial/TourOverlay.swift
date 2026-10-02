@@ -5,6 +5,8 @@ struct TourOverlay: View {
     @Environment(TourController.self) private var tour
     /// Força recalcular a posição do alvo enquanto a troca de aba/layout termina.
     @State private var remedicao = 0
+    /// Só depois de esgotar a procura o balão aparece centralizado, sem seta.
+    @State private var procuraEsgotada = false
 
     var body: some View {
         if let indice = tour.passoAtual {
@@ -12,8 +14,7 @@ struct TourOverlay: View {
                 let _ = remedicao
                 let origem = proxy.frame(in: .global).origin
                 let passo = tour.passos[indice]
-                let furo = passo.alvo
-                    .flatMap { tour.frame(de: $0) }
+                let furo = tour.frame(de: passo.alvo)
                     .map { $0.offsetBy(dx: -origem.x, dy: -origem.y).insetBy(dx: -8, dy: -8) }
                     .flatMap { visivel($0, em: proxy.size) ? $0 : nil }
 
@@ -31,7 +32,7 @@ struct TourOverlay: View {
                                      furoNaMetadeDeCima(furo, proxy.size) ? furo.maxY + 56 : proxy.size.height - furo.minY + 56)
                             .frame(maxWidth: .infinity, maxHeight: .infinity,
                                    alignment: furoNaMetadeDeCima(furo, proxy.size) ? .topLeading : .bottomLeading)
-                    } else {
+                    } else if procuraEsgotada {
                         balao(passo, indice: indice)
                             .frame(width: larguraBalao(proxy.size))
                     }
@@ -41,10 +42,16 @@ struct TourOverlay: View {
             }
             .ignoresSafeArea()
             .task(id: indice) {
-                for _ in 0..<4 {
-                    try? await Task.sleep(for: .milliseconds(150))
+                procuraEsgotada = false
+                // Procura o alvo por até 2s (troca de aba, layout, animação da barra).
+                // Depois de achar, remede mais algumas vezes para pegar a posição final.
+                var medicoesAposAchar = 0
+                for _ in 0..<20 where medicoesAposAchar < 3 {
+                    try? await Task.sleep(for: .milliseconds(100))
                     remedicao += 1
+                    if tour.frame(de: tour.passos[indice].alvo) != nil { medicoesAposAchar += 1 }
                 }
+                if medicoesAposAchar == 0 { procuraEsgotada = true }
             }
             .transition(.opacity)
         }
@@ -84,6 +91,7 @@ struct TourOverlay: View {
             }
             .position(x: furo.midX, y: acima ? furo.maxY + 28 : furo.minY - 28)
             .allowsHitTesting(false)
+            .accessibilityIdentifier("setaDoTour")
     }
 
     private func balao(_ passo: PassoTour, indice: Int) -> some View {

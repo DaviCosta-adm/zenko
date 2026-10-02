@@ -12,16 +12,17 @@ enum AbaApp: Hashable {
 
 /// Elementos reais da interface que o tour pode destacar.
 enum AlvoTour: Hashable {
-    case novoItem, importarCalendario, novoLembrete, aparencia, verTutorial
+    case abaPainel, novoItem, exemploItem, importarCalendario, novoLembrete, aparencia, verTutorial
 
-    /// Botões de toolbar viram botões nativos do UIKit e descartam qualquer `.background`;
-    /// eles são localizados pelo rótulo de acessibilidade (o texto do `Label`).
-    var rotuloNaBarra: String? {
+    /// Abas e botões de toolbar viram controles nativos do UIKit e descartam qualquer
+    /// `.background`; eles são localizados pelo rótulo de acessibilidade (o texto do `Label`).
+    var rotuloNativo: String? {
         switch self {
+        case .abaPainel: "Painel"
         case .novoItem: "Novo item"
         case .importarCalendario: "Importar Calendário"
         case .novoLembrete: "Novo lembrete"
-        case .aparencia, .verTutorial: nil
+        case .exemploItem, .aparencia, .verTutorial: nil
         }
     }
 }
@@ -35,7 +36,7 @@ struct PassoTour {
     }
 
     let aba: AbaApp
-    var alvo: AlvoTour? = nil
+    let alvo: AlvoTour
     var imagem: String? = nil
     let titulo: String
     let texto: String
@@ -44,9 +45,10 @@ struct PassoTour {
     static let todos: [PassoTour] = [
         PassoTour(
             aba: .painel,
+            alvo: .abaPainel,
             imagem: "LogoZenko",
             titulo: "Bem-vindo ao Zenko",
-            texto: "Vou te mostrar em 30 segundos onde fica cada coisa. Toque em Próximo para começar."
+            texto: "Esta é a aba Painel, sua tela principal. Vou te mostrar em 30 segundos onde fica cada coisa."
         ),
         PassoTour(
             aba: .painel,
@@ -56,8 +58,9 @@ struct PassoTour {
         ),
         PassoTour(
             aba: .painel,
+            alvo: .exemploItem,
             titulo: "Bata o olho na cor",
-            texto: "Cada item aparece no Painel com uma nota de 0% a 100%:",
+            texto: "Assim fica cada item no Painel, com uma nota de 0% a 100% à direita:",
             dicas: [
                 .init(icone: "circle.fill", cor: .red, texto: "Vermelho: resolva logo."),
                 .init(icone: "circle.fill", cor: .orange, texto: "Laranja: fique de olho."),
@@ -100,12 +103,16 @@ final class TourController {
 
     let passos = PassoTour.todos
 
+    var passo: PassoTour? {
+        passoAtual.map { passos[$0] }
+    }
+
     @ObservationIgnored private var fontes: [AlvoTour: ReferenciaFraca] = [:]
 
     /// Posição do alvo em coordenadas da janela, ou nil se ele não estiver na tela agora
     /// (ex: está numa aba que não é a selecionada).
     func frame(de alvo: AlvoTour) -> CGRect? {
-        if let rotulo = alvo.rotuloNaBarra {
+        if let rotulo = alvo.rotuloNativo {
             return frameNaJanela(comRotulo: rotulo)
         }
         guard let view = fontes[alvo]?.view, let janela = view.window, !view.isHidden else { return nil }
