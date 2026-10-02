@@ -13,11 +13,13 @@ final class LembretesViewModel {
         self.scheduler = scheduler ?? ReminderScheduler()
     }
 
-    func solicitarPermissao() async {
-        permissaoNegada = !(await scheduler.solicitarPermissao())
+    func verificarPermissao() async {
+        permissaoNegada = await scheduler.permissaoFoiNegada()
     }
 
-    func criar(titulo: String, descricao: String, hora: Int, minuto: Int, diasSemana: Set<Int>, context: ModelContext) {
+    /// A permissão só é pedida aqui, no primeiro lembrete, e não ao abrir a aba.
+    func criar(titulo: String, descricao: String, hora: Int, minuto: Int, diasSemana: Set<Int>, context: ModelContext) async {
+        permissaoNegada = !(await scheduler.solicitarPermissao())
         let lembrete = Lembrete(
             titulo: titulo,
             descricao: descricao.isEmpty ? nil : descricao,

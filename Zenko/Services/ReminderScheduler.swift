@@ -8,6 +8,10 @@ final class ReminderScheduler {
         return (try? await centro.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
     }
 
+    func permissaoFoiNegada() async -> Bool {
+        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .denied
+    }
+
     func agendar(_ lembrete: Lembrete) {
         guard lembrete.ativo else { return }
 

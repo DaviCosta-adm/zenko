@@ -51,10 +51,12 @@ struct LembretesView: View {
             }
             .sheet(isPresented: $mostrandoNovo) {
                 NovoLembreteView { titulo, descricao, hora, minuto, dias in
-                    viewModel.criar(titulo: titulo, descricao: descricao, hora: hora, minuto: minuto, diasSemana: dias, context: context)
+                    Task {
+                        await viewModel.criar(titulo: titulo, descricao: descricao, hora: hora, minuto: minuto, diasSemana: dias, context: context)
+                    }
                 }
             }
-            .task { await viewModel.solicitarPermissao() }
+            .task { await viewModel.verificarPermissao() }
         }
     }
 }

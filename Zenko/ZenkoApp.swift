@@ -29,23 +29,28 @@ struct ZenkoApp: App {
 private struct RaizView: View {
     @Environment(\.modelContext) private var context
     @AppStorage(TutorialStorage.concluido) private var tutorialConcluido = false
+    @State private var tour = TourController()
 
     var body: some View {
-        TabView {
+        TabView(selection: $tour.abaSelecionada) {
             PainelView()
                 .tabItem { Label("Painel", systemImage: "tray.full") }
+                .tag(AbaApp.painel)
             LembretesView()
                 .tabItem { Label("Lembretes", systemImage: "alarm") }
+                .tag(AbaApp.lembretes)
             ConfiguracoesView()
                 .tabItem { Label("Configurações", systemImage: "gearshape") }
+                .tag(AbaApp.configuracoes)
         }
-        .task { PreferenciaRepository(context: context).carregarOuCriar() }
-        .fullScreenCover(isPresented: Binding(
-            get: { !tutorialConcluido },
-            set: { tutorialConcluido = !$0 }
-        )) {
-            TutorialView()
-                .temaZenko()
+        .overlay { TourOverlay() }
+        .environment(tour)
+        .task {
+            PreferenciaRepository(context: context).carregarOuCriar()
+            if !tutorialConcluido {
+                try? await Task.sleep(for: .milliseconds(400))
+                withAnimation { tour.iniciar() }
+            }
         }
     }
 }

@@ -403,10 +403,10 @@
 				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Zenko;
-				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -442,10 +442,10 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Zenko;
-				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
-				INFOPLIST_KEY_NSCalendarsUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "O Zenko usa seu Calendário para identificar compromissos importantes e organizá-los por prioridade.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

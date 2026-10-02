@@ -8,7 +8,7 @@ struct ConfiguracoesView: View {
     @State private var viewModel = ConfiguracoesViewModel()
     @State private var novaPalavra = ""
     @State private var novoPeso = 20
-    @State private var mostrandoTutorial = false
+    @Environment(TourController.self) private var tour: TourController?
 
     var body: some View {
         NavigationStack {
@@ -19,11 +19,13 @@ struct ConfiguracoesView: View {
                     } label: {
                         Label("Aparência", systemImage: "paintpalette")
                     }
+                    .alvoDoTour(.aparencia)
                     Button {
-                        mostrandoTutorial = true
+                        withAnimation { tour?.iniciar() }
                     } label: {
                         Label("Ver tutorial", systemImage: "questionmark.circle")
                     }
+                    .alvoDoTour(.verTutorial)
                 }
                 if let preferencia = preferencias.first {
                     secaoPreferencias(preferencia)
@@ -31,10 +33,6 @@ struct ConfiguracoesView: View {
                 secaoRegras
             }
             .navigationTitle("Configurações")
-            .sheet(isPresented: $mostrandoTutorial) {
-                TutorialView()
-                    .temaZenko()
-            }
             .task { viewModel.garantirPreferencias(context: context) }
         }
     }
