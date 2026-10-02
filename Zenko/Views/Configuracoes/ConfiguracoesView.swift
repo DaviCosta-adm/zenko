@@ -9,6 +9,8 @@ struct ConfiguracoesView: View {
     @State private var novaPalavra = ""
     @State private var novoPeso = 20
     @Environment(TourController.self) private var tour: TourController?
+    @Environment(AuthController.self) private var auth: AuthController?
+    @State private var confirmandoSaida = false
 
     var body: some View {
         NavigationStack {
@@ -27,13 +29,34 @@ struct ConfiguracoesView: View {
                     }
                     .alvoDoTour(.verTutorial)
                 }
+                secaoConta
                 if let preferencia = preferencias.first {
                     secaoPreferencias(preferencia)
                 }
                 secaoRegras
             }
             .navigationTitle("Configurações")
+            .confirmationDialog("Sair da conta?", isPresented: $confirmandoSaida, titleVisibility: .visible) {
+                Button("Sair", role: .destructive) {
+                    Task { await auth?.sair() }
+                }
+            } message: {
+                Text("Você vai precisar entrar de novo com seu e-mail e senha.")
+            }
             .task { viewModel.garantirPreferencias(context: context) }
+        }
+    }
+
+    private var secaoConta: some View {
+        Section("Conta") {
+            if let email = auth?.email {
+                LabeledContent("E-mail", value: email)
+            }
+            Button(role: .destructive) {
+                confirmandoSaida = true
+            } label: {
+                Label("Sair da conta", systemImage: "rectangle.portrait.and.arrow.right")
+            }
         }
     }
 

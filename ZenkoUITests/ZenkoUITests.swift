@@ -4,7 +4,7 @@ final class ZenkoUITests: XCTestCase {
     @MainActor
     func testAbreComAsTresAbas() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitesting-pular-tutorial"]
+        app.launchArguments = ["-uitesting-sem-login", "-uitesting-pular-tutorial"]
         app.launch()
 
         XCTAssertTrue(app.tabBars.buttons["Painel"].waitForExistence(timeout: 5))
@@ -16,7 +16,7 @@ final class ZenkoUITests: XCTestCase {
     @MainActor
     func testTourPercorreTodasAsAbasEFecha() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitesting-mostrar-tutorial"]
+        app.launchArguments = ["-uitesting-sem-login", "-uitesting-mostrar-tutorial"]
         app.launch()
 
         let proximo = app.buttons["Próximo"]
@@ -42,12 +42,55 @@ final class ZenkoUITests: XCTestCase {
     @MainActor
     func testPularEncerraOTour() throws {
         let app = XCUIApplication()
-        app.launchArguments = ["-uitesting-mostrar-tutorial"]
+        app.launchArguments = ["-uitesting-sem-login", "-uitesting-mostrar-tutorial"]
         app.launch()
 
         XCTAssertTrue(app.buttons["Pular"].waitForExistence(timeout: 5))
         app.buttons["Pular"].tap()
 
         XCTAssertFalse(app.buttons["Próximo"].waitForExistence(timeout: 1))
+    }
+
+    @MainActor
+    func testSemLoginAbreATelaDeEntrarEValidaCampos() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitesting-deslogar"]
+        app.launch()
+
+        let enviar = app.buttons["botaoEnviar"]
+        XCTAssertTrue(enviar.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.tabBars.buttons["Painel"].exists, "O app não pode abrir sem login")
+
+        enviar.tap()
+        XCTAssertTrue(app.staticTexts["Digite seu e-mail."].waitForExistence(timeout: 2))
+
+        app.textFields["campoEmail"].tap()
+        app.textFields["campoEmail"].typeText("ana@exemplo.com")
+        app.buttons["Criar conta"].tap()
+        app.secureTextFields["campoSenha"].tap()
+        app.secureTextFields["campoSenha"].typeText("123")
+        enviar.tap()
+        XCTAssertTrue(app.staticTexts["A senha precisa ter pelo menos 6 caracteres."].waitForExistence(timeout: 2))
+    }
+
+    @MainActor
+    func testSairDaContaVoltaParaOLogin() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitesting-deslogar", "-uitesting-pular-tutorial"]
+        app.launch()
+
+        let entrarDev = app.buttons["Entrar sem servidor (só em desenvolvimento)"]
+        XCTAssertTrue(entrarDev.waitForExistence(timeout: 5))
+        entrarDev.tap()
+
+        let abaConfiguracoes = app.tabBars.buttons["Configurações"].firstMatch
+        XCTAssertTrue(abaConfiguracoes.waitForExistence(timeout: 5))
+        abaConfiguracoes.tap()
+        let sair = app.buttons["Sair da conta"]
+        XCTAssertTrue(sair.waitForExistence(timeout: 3))
+        sair.tap()
+        app.buttons["Sair"].tap()
+
+        XCTAssertTrue(app.buttons["botaoEnviar"].waitForExistence(timeout: 3))
     }
 }

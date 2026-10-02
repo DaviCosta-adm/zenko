@@ -12,9 +12,12 @@ struct ZenkoApp: App {
         }
     }
 
+    @State private var auth = AuthController()
+
     var body: some Scene {
         WindowGroup {
-            RaizView()
+            PortaoDeLogin()
+                .environment(auth)
                 .temaZenko()
         }
         .modelContainer(for: [
@@ -23,6 +26,31 @@ struct ZenkoApp: App {
             RegraClassificacao.self,
             PreferenciaUsuario.self,
         ])
+    }
+}
+
+/// O app só abre depois do login.
+private struct PortaoDeLogin: View {
+    @Environment(AuthController.self) private var auth
+
+    var body: some View {
+        Group {
+            switch auth.estado {
+            case .carregando:
+                Image("LogoZenko")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 84, height: 84)
+            case .deslogado:
+                LoginView()
+                    .transition(.opacity)
+            case .logado:
+                RaizView()
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: auth.estado)
+        .task { await auth.restaurar() }
     }
 }
 
