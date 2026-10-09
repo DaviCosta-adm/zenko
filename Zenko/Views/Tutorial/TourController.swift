@@ -69,7 +69,7 @@ struct PassoTour {
                 .init(icone: "circle.fill", cor: .red, texto: "Vermelho: resolva logo."),
                 .init(icone: "circle.fill", cor: .orange, texto: "Laranja: fique de olho."),
                 .init(icone: "circle.fill", cor: .gray, texto: "Cinza: pode esperar."),
-                .init(icone: "hand.tap.fill", cor: .secondary, texto: "Toque no item para marcar como visto; arraste para a esquerda para apagar."),
+                .init(icone: "hand.tap.fill", cor: .secondary, texto: "Toque no item para ver os detalhes; arraste para a esquerda para apagar."),
             ]
         ),
         PassoTour(

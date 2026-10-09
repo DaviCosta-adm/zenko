@@ -20,4 +20,8 @@ final class ConfiguracoesViewModel {
     func removerRegra(_ regra: RegraClassificacao, context: ModelContext) {
         PreferenciaRepository(context: context).removerRegra(regra)
     }
+
+    func reagendarLembretes(context: ModelContext) {
+        LembreteRepository(context: context).reagendarTodos()
+    }
 }

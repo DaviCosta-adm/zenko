@@ -1,0 +1,5 @@
+# Projeto Supabase do Zenko. A chave da Claude NÃO entra neste arquivo.
+project_id = "ouhswumipggqoafnofch"
+
+[functions.classificar]
+verify_jwt = true

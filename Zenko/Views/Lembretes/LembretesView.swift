@@ -4,6 +4,7 @@ import SwiftData
 struct LembretesView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: [SortDescriptor(\Lembrete.hora), SortDescriptor(\Lembrete.minuto)]) var lembretes: [Lembrete]
+    @Query private var preferencias: [PreferenciaUsuario]
     @State private var viewModel = LembretesViewModel()
     @State private var mostrandoNovo = false
 
@@ -27,6 +28,11 @@ struct LembretesView: View {
                             Text(viewModel.descricaoDias(lembrete))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                            if caiNoSilencio(lembrete) {
+                                Text("Nesse horário o Zenko está em silêncio e não vai avisar.")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
                         }
                     }
                 }
@@ -58,6 +64,16 @@ struct LembretesView: View {
             }
             .task { await viewModel.verificarPermissao() }
         }
+    }
+
+    private func caiNoSilencio(_ lembrete: Lembrete) -> Bool {
+        guard let preferencia = preferencias.first else { return false }
+        return HorarioSilencio.horarioCaiNoPeriodo(
+            hora: lembrete.hora,
+            minuto: lembrete.minuto,
+            inicio: preferencia.silencioInicio,
+            fim: preferencia.silencioFim
+        )
     }
 }
 

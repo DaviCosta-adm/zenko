@@ -63,10 +63,18 @@ struct ConfiguracoesView: View {
     private func secaoPreferencias(_ preferencia: PreferenciaUsuario) -> some View {
         @Bindable var preferencia = preferencia
         return Group {
-            Section("Horário de silêncio") {
+            Section {
                 CampoHorario(titulo: "Início", hora: $preferencia.silencioInicioHora, minuto: $preferencia.silencioInicioMinuto)
                 CampoHorario(titulo: "Fim", hora: $preferencia.silencioFimHora, minuto: $preferencia.silencioFimMinuto)
+            } header: {
+                Text("Horário de silêncio")
+            } footer: {
+                Text("Nesse período o Zenko não dispara lembretes. No Painel, só o urgente (70% ou mais) aparece, a menos que você peça para ver tudo. Início e fim iguais desligam o silêncio.")
             }
+            .onChange(of: preferencia.silencioInicioHora) { _, _ in viewModel.reagendarLembretes(context: context) }
+            .onChange(of: preferencia.silencioInicioMinuto) { _, _ in viewModel.reagendarLembretes(context: context) }
+            .onChange(of: preferencia.silencioFimHora) { _, _ in viewModel.reagendarLembretes(context: context) }
+            .onChange(of: preferencia.silencioFimMinuto) { _, _ in viewModel.reagendarLembretes(context: context) }
             Section {
                 Slider(
                     value: Binding(

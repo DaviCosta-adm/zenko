@@ -93,6 +93,33 @@ final class ZenkoUITests: XCTestCase {
     }
 
     @MainActor
+    func testPainelCriaItemAbreDetalheEFiltra() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uitesting-sem-login", "-uitesting-pular-tutorial"]
+        app.launch()
+
+        XCTAssertTrue(app.navigationBars["Zenko"].waitForExistence(timeout: 5))
+        app.buttons["Novo item"].firstMatch.tap()
+        let titulo = app.textFields["Título"]
+        XCTAssertTrue(titulo.waitForExistence(timeout: 3))
+        titulo.tap()
+        titulo.typeText("Boleto da luz")
+        app.buttons["Salvar"].tap()
+
+        XCTAssertTrue(app.staticTexts["Boleto da luz"].waitForExistence(timeout: 5))
+        app.staticTexts["Boleto da luz"].tap()
+        XCTAssertTrue(app.navigationBars["Detalhe"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Já visto"].waitForExistence(timeout: 2))
+        app.navigationBars["Detalhe"].buttons.firstMatch.tap()
+
+        let busca = app.textFields["campoBuscaPainel"]
+        XCTAssertTrue(busca.waitForExistence(timeout: 3))
+        busca.tap()
+        busca.typeText("xyz-nao-existe")
+        XCTAssertTrue(app.staticTexts["Nenhum item neste filtro"].waitForExistence(timeout: 3))
+    }
+
+    @MainActor
     func testSairDaContaVoltaParaOLogin() throws {
         let app = XCUIApplication()
         app.launchArguments = ["-uitesting-sem-login", "-uitesting-pular-tutorial"]

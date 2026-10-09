@@ -21,6 +21,11 @@ final class ItemRepository {
         try? context.save()
     }
 
+    func alternarLido(_ item: ItemRegistrado) {
+        item.lido.toggle()
+        try? context.save()
+    }
+
     func listarTodos() -> [ItemRegistrado] {
         (try? context.fetch(FetchDescriptor<ItemRegistrado>(
             sortBy: [SortDescriptor(\.timestamp, order: .reverse)]

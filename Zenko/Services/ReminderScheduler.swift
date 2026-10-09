@@ -12,8 +12,17 @@ final class ReminderScheduler {
         await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .denied
     }
 
-    func agendar(_ lembrete: Lembrete) {
+    func agendar(_ lembrete: Lembrete, silencio: PreferenciaUsuario? = nil) {
         guard lembrete.ativo else { return }
+        if let silencio, HorarioSilencio.horarioCaiNoPeriodo(
+            hora: lembrete.hora,
+            minuto: lembrete.minuto,
+            inicio: silencio.silencioInicio,
+            fim: silencio.silencioFim
+        ) {
+            cancelar(lembrete)
+            return
+        }
 
         let conteudo = UNMutableNotificationContent()
         conteudo.title = "⏰ \(lembrete.titulo)"

@@ -14,17 +14,30 @@ final class LembreteRepository {
     func criar(_ lembrete: Lembrete) {
         context.insert(lembrete)
         try? context.save()
-        scheduler.agendar(lembrete)
+        scheduler.agendar(lembrete, silencio: silencioAtual())
     }
 
     func alternarAtivo(_ lembrete: Lembrete) {
         lembrete.ativo.toggle()
         try? context.save()
         if lembrete.ativo {
-            scheduler.agendar(lembrete)
+            scheduler.agendar(lembrete, silencio: silencioAtual())
         } else {
             scheduler.cancelar(lembrete)
         }
+    }
+
+    func reagendarTodos() {
+        let lembretes = (try? context.fetch(FetchDescriptor<Lembrete>())) ?? []
+        let silencio = silencioAtual()
+        for lembrete in lembretes {
+            scheduler.cancelar(lembrete)
+            scheduler.agendar(lembrete, silencio: silencio)
+        }
+    }
+
+    private func silencioAtual() -> PreferenciaUsuario {
+        PreferenciaRepository(context: context).carregarOuCriar()
     }
 
     func remover(_ lembrete: Lembrete) {

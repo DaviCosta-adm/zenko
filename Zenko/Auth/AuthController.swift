@@ -27,6 +27,12 @@ final class AuthController {
         return nil
     }
 
+    /// Token real da sessão. Vazio no modo desenvolvimento, então a IA não é chamada.
+    var accessToken: String? {
+        guard case .logado(let sessao) = estado, !sessao.accessToken.isEmpty else { return nil }
+        return sessao.accessToken
+    }
+
     /// Recupera a sessão do Keychain ao abrir o app e renova o token se ele venceu.
     func restaurar() async {
         #if DEBUG

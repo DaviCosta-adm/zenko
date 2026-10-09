@@ -14,3 +14,7 @@ build/
 AuthKey_*.p8
 Secrets.plist
 **/Secrets.plist
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
